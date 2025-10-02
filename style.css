@@ -1,0 +1,147 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(-45deg, #004aad, #f7d700, #004aad, #f7d700);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: #222;
+}
+
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+.topbar {
+  background: #004aad;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.section {
+  background: #fff;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.hidden {display:none;}
+
+h2 {color: #004aad;}
+
+ul.cours-list {
+  list-style: none;
+  padding: 0;
+}
+ul.cours-list li {
+  margin: 10px 0;
+}
+ul.cours-list a {
+  text-decoration: none;
+  font-weight: bold;
+  color: #004aad;
+}
+ul.cours-list a:hover {
+  color: #f7d700;
+}
+
+.login-container {
+  width: 300px;
+  margin: 100px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ccc;
+  text-align: center;
+}
+
+.login-container input, .login-container button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.grid {
+  margin: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+  gap: 20px;
+}
+.card {
+  background: #fafafa;
+  border: 2px solid #004aad;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+.card:hover {
+  transform: scale(1.05);
+  background: #f7f7f7;
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.message-list .card {
+  background: #e8f0ff;
+  text-align: left;
+  padding: 10px;
+}
+
+.popup {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #004aad;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  display: none;
+  animation: fadeInOut 3s ease;
+}
+
+@keyframes fadeInOut {
+  0% {opacity: 0;}
+  10% {opacity: 1;}
+  90% {opacity: 1;}
+  100% {opacity: 0;}
+}
+
+.btn {
+  background: #004aad;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.btn:hover {
+  background: #002f73;
+}
+
+.logout {
+  text-align: center;
+  margin: 30px 0;
+}
+.btn-logout {
+  background: red;
+  color: white;
+  font-weight: bold;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn-logout:hover {
+  background: darkred;
+}
