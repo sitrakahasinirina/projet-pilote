@@ -96,3 +96,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
+
+function logout() {
+  localStorage.removeItem("user");
+  localStorage.removeItem("role");
+  localStorage.removeItem("filiere");
+  window.location.href = "index.html";
+}
