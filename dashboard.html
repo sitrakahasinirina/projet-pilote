@@ -9,13 +9,21 @@
     .hidden { display: none; }
     .btn { padding: 5px 10px; margin-top: 5px; cursor: pointer; }
     .message-list .card { margin-bottom: 10px; }
+    .info-section { background: #f3f3f3; padding: 15px; border-radius: 10px; margin: 20px 0; }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <h1>Orion University - Plateforme de cours en ligne</h1>
+    <h1 id="dashboardTitle">Orion University - Plateforme de cours en ligne</h1>
+    <p id="dashboardFiliere"></p>
   </header>
 
+  <section class="info-section">
+    <h2>Pourquoi choisir Orion University ?</h2>
+    <p>3 ans d’études académiques = 2 ans d’expérience professionnelle dans votre domaine (avec certificat de travail).</p>
+    <p>Licence Professionnelle habilitée et reconnue par le FOP ainsi qu’une Certificat Internationale.</p>
+    <p>Tous ça avec des frais de cours très raisonnables.</p>
+  </section>
 
   <section id="adminSection" class="section hidden">
     <h2>Envoyer un message</h2>
@@ -38,12 +46,13 @@
   </section>
 
   <main class="grid">
-   <button style="border-radius: 50%;border: 25pc;"> <h2>Progression des matières :</h2></button>
+    <button style="border-radius: 50%;border: 25pc;"> <h2>Progression des matières :</h2></button>
     <div class="card"><h3>Développement web</h3><p>Progression : 60%</p></div>
     <div class="card"><h3>Robotique & IA</h3><p>Progression : 45%</p></div>
     <div class="card"><h3>Réseau Informatique</h3><p>Progression : 70%</p></div>
     <div class="card"><h3>Ingéniorat d'Asservissement</h3><p>Progression : 30%</p></div>
   </main>
+
   <div id="popupNotif" class="popup"></div>
 
   <div class="logout">
@@ -51,5 +60,19 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const filiere = localStorage.getItem("filiere");
+      const title = document.getElementById("dashboardTitle");
+      const filiereEl = document.getElementById("dashboardFiliere");
+
+      if (filiere) {
+        filiereEl.textContent = `Filière : ${filiere}`;
+        if (filiere.includes("Informatique")) {
+          title.textContent = "Orion University - Cours en Ligne";
+        }
+      }
+    });
+  </script>
 </body>
 </html>
