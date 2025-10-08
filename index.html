@@ -1,27 +1,82 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cours en ligne - Orion University</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orion University - Cours en Ligne</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header class="topbar">
-  <h1>Page d'entrée au cours en ligne en Informatique de l'Orion University</h1>
-</header>
+  <header>
+    <h1 id="mainHeader">Orion University - Cours en Ligne</h1>
+  </header>
 
-<main class="login-container">
-  <h2>Connexion</h2>
-  <form id="loginForm">
-    <input type="email" id="email" placeholder="Votre email (ex: etudiant1@orion.com)" required>
-    <input type="password" id="password" placeholder="Mot de passe (demo)">
-    <button type="submit">Se connecter</button>
-    <p id="error" style="color:red;margin-top:8px;"></p>
-  </form>
-</main>
+  <main class="login-container">
+    <div class="login-box">
+      <h2>Se connecter</h2>
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <input type="email" id="email" required />
 
+        <label for="password">Mot de passe</label>
+        <div style="position: relative;">
+          <input type="password" id="password" required />
+          <span onclick="togglePassword()" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;">👁️</span>
+        </div>
 
-<script src="script.js"></script>
+        <button type="submit">Connexion</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Modal de choix de filière -->
+  <div id="filiereModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Choisissez votre filière</h2>
+      <div class="filiere">
+        <h3>Informatique</h3>
+        <ul>
+          <li>Développement Web et Application Mobile</li>
+          <li>Cybersécurité</li>
+          <li>Robotique et Intelligence Artificielle</li>
+          <li>Télécommunication</li>
+        </ul>
+        <div>
+          <strong>Avantages Orion University :</strong>
+          <p>3 ans d’études académiques = 2 ans d’expérience professionnelle dans votre domaine (avec certificat de travail). Licence Professionnelle habilitée et reconnue par le FOP, et également un Certificat International. Tout cela avec des frais de cours très raisonnables.</p>
+        </div>
+        <button class="filiere-btn" data-filiere="Informatique">Choisir</button>
+      </div>
+
+      <div class="filiere">
+        <h3>Multimédia</h3>
+        <p>Le multimédia regroupe la conception graphique, le montage vidéo, l’animation 2D/3D, le design UI/UX et la production audiovisuelle. C’est un domaine créatif alliant technologie et communication visuelle.</p>
+        <div>
+          <strong>Avantages Orion University :</strong>
+          <p>3 ans d’études académiques = 2 ans d’expérience professionnelle dans votre domaine (avec certificat de travail). Licence Professionnelle habilitée et reconnue par le FOP, et également un Certificat International. Tout cela avec des frais de cours très raisonnables.</p>
+        </div>
+        <button class="filiere-btn" data-filiere="Multimédia">Choisir</button>
+      </div>
+<div class="filiere">
+        <h3>Finance et Comptabilité</h3>
+        <p>La finance et la comptabilité englobent la gestion financière, la comptabilité générale, l’analyse des coûts et l’utilisation des outils comptables pour soutenir la prise de décision en entreprise.</p>
+        <div>
+          <strong>Avantages Orion University :</strong>
+          <p>3 ans d’études académiques = 2 ans d’expérience professionnelle dans votre domaine (avec certificat de travail). Licence Professionnelle habilitée et reconnue par le FOP, et également un Certificat International. Tout cela avec des frais de cours très raisonnables.</p>
+        </div>
+        <button class="filiere-btn" data-filiere="Finance et Comptabilité">Choisir</button>
+      </div>
+
+      <button id="filiereCancel">Annuler</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    function togglePassword() {
+      const pwd = document.getElementById("password");
+      pwd.type = pwd.type === "password" ? "text" : "password";
+    }
+  </script>
 </body>
 </html>
