@@ -8,14 +8,31 @@
   <style>
     .hidden { display: none; }
     .btn { padding: 5px 10px; margin-top: 5px; cursor: pointer; }
-    .message-list .card { margin-bottom: 10px; }
+    .message-list .card { margin-bottom: 10px; padding:10px; border-radius:6px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
     .info-section { background: #f3f3f3; padding: 15px; border-radius: 10px; margin: 20px 0; }
+    .topbar { padding:16px; background: #0b5; color:#fff; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px; padding:16px; }
+    .card { background:#fff; padding:12px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+    .cours-list li { margin-bottom:8px; }
+    .btn-logout { background: red; color: white; font-weight: bold; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; }
+    .btn-logout:hover { background: darkred; }
+    .actions { margin-top:8px; display:flex; gap:8px; }
+    .icon-btn { border: none; background:transparent; cursor:pointer; padding:6px; border-radius:6px; }
+    .icon-btn:hover { background: rgba(0,0,0,0.04); }
+    .modal { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.45); z-index: 1200; opacity:0; transform:translateY(6px); pointer-events:none; transition: all 180ms ease; }
+    .modal.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+    .modal-content { background:#fff; padding:16px; border-radius:10px; width: 90%; max-width:560px; box-shadow:0 10px 30px rgba(0,0,0,0.12); }
+    .modal-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+    .confirm-btn { background:#d9534f; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    .save-btn { background:#2b8a3e; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    .cancel-btn { background:#eee; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+    .small-muted { font-size:12px; color:#666; margin-top:6px; }
+    textarea#messageInput { width:100%; min-height:80px; padding:8px; border-radius:6px; border:1px solid #ddd; }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <h1 id="dashboardTitle">Orion University - Plateforme de cours en ligne</h1>
-    <p id="dashboardFiliere"></p>
+    <h1>Orion University - Plateforme de cours en ligne</h1>
   </header>
 
   <section class="info-section">
@@ -28,7 +45,9 @@
   <section id="adminSection" class="section hidden">
     <h2>Envoyer un message</h2>
     <textarea id="messageInput" placeholder="Écrire un message..."></textarea>
-    <button class="btn" onclick="envoyerMessage()">Publier</button>
+    <div style="margin-top:8px;">
+      <button class="btn" id="publishBtn">Publier</button>
+    </div>
   </section>
 
   <section class="section">
@@ -37,20 +56,15 @@
   </section>
 
   <section class="section">
-    <h2>I - Cours de Cybersécurité :</h2>
-    <ul class="cours-list">
-      <li><a href="src/3-Les ports.pdf" target="_blank">1- Les ports</a></li>
-      <li><a href="src/3-TP02 Prise de contrôle d’un PC Windows 10 depuis Kali avec Metasploit (port 1234).pdf" target="_blank">2- Prise de contrôle d'un PC</a></li>
-      <li><a href="src/7-Team et types alertes en cybersecurite.pdf" target="_blank">3- Types d'alertes en cybersécurité</a></li>
+    <h2 id="coursTitle">I - Cours en Informatique :</h2>
+    <ul id="coursList" class="cours-list">
+      <li><a href="src/exemple.pdf" target="_blank">1 - exemple.pdf</a></li>
     </ul>
   </section>
 
   <main class="grid">
-    <button style="border-radius: 50%;border: 25pc;"> <h2>Progression des matières :</h2></button>
-    <div class="card"><h3>Développement web</h3><p>Progression : 60%</p></div>
-    <div class="card"><h3>Robotique & IA</h3><p>Progression : 45%</p></div>
-    <div class="card"><h3>Réseau Informatique</h3><p>Progression : 70%</p></div>
-    <div class="card"><h3>Ingéniorat d'Asservissement</h3><p>Progression : 30%</p></div>
+    <button style="border-radius: 50%; border: 25pc;"> <h2>Progression des matières :</h2></button>
+    <div id="progressCards"></div>
   </main>
 
   <div id="popupNotif" class="popup"></div>
@@ -59,20 +73,223 @@
     <button class="btn-logout" onclick="logout()">Se déconnecter</button>
   </div>
 
-  <script src="script.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const filiere = localStorage.getItem("filiere");
-      const title = document.getElementById("dashboardTitle");
-      const filiereEl = document.getElementById("dashboardFiliere");
+  <div id="editModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <h3>Modifier le message</h3>
+      <textarea id="editMessage" style="width:100%; min-height:100px; padding:8px; border-radius:6px; border:1px solid #ddd;"></textarea>
+      <div class="small-muted" id="editMeta"></div>
+      <div class="modal-footer">
+        <button class="cancel-btn" id="cancelEdit">Annuler</button>
+        <button class="save-btn" id="saveEdit">Enregistrer</button>
+      </div>
+    </div>
+  </div>
 
-      if (filiere) {
-        filiereEl.textContent = `Filière : ${filiere}`;
-        if (filiere.includes("Informatique")) {
-          title.textContent = "Orion University - Cours en Ligne";
+  <div id="confirmModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <h3>Confirmation</h3>
+      <p id="confirmText">Voulez-vous supprimer ce message ?</p>
+      <div class="modal-footer">
+        <button class="cancel-btn" id="cancelDelete">Non</button>
+        <button class="confirm-btn" id="confirmDelete">Oui, supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      function loadNotifications() {
+        try {
+          return JSON.parse(localStorage.getItem('notifications') || '[]');
+        } catch (e) {
+          return [];
         }
       }
-    });
+      function saveNotifications(n) {
+        localStorage.setItem('notifications', JSON.stringify(n));
+      }
+      function formatDate(d) {
+        const dt = new Date(d);
+        const dd = String(dt.getDate()).padStart(2,'0');
+        const mm = String(dt.getMonth()+1).padStart(2,'0');
+        const yyyy = dt.getFullYear();
+        const hh = String(dt.getHours()).padStart(2,'0');
+        const min = String(dt.getMinutes()).padStart(2,'0');
+        return `Publié le ${dd}/${mm}/${yyyy} à ${hh}:${min}`;
+      }
+
+      const role = localStorage.getItem('role') || '';
+      const filiere = localStorage.getItem('filiere') || '';
+
+      if (role === 'admin') {
+        document.getElementById('adminSection').classList.remove('hidden');
+      }
+
+      const coursList = document.getElementById('coursList');
+      const coursTitle = document.getElementById('coursTitle');
+      const progressCards = document.getElementById('progressCards');
+
+      let cours = [];
+      let progress = [];
+
+      if (filiere.includes('Informatique')) {
+        coursTitle.textContent = "I - Cours en Informatique :";
+        cours = [
+          "Développement Web - exemple.pdf",
+          "Application Mobile - exemple.pdf",
+          "Cybersécurité - exemple.pdf",
+          "Robotique et IA - exemple.pdf"
+        ];
+        progress = [
+          ["Développement Web", "60%"],
+          ["Robotique & IA", "45%"],
+          ["Réseau Informatique", "70%"],
+          ["Ingéniorat d'Asservissement", "30%"]
+        ];
+        document.getElementById('dashboardTitle') && (document.getElementById('dashboardTitle').textContent = "Orion University - Cours en Ligne");
+      } else if (filiere.includes('Multimédia')) {
+        coursTitle.textContent = "I - Cours en Multimédia :";
+        cours = [
+          "Montage Vidéo - exemple.pdf",
+          "Design Graphique - exemple.pdf",
+          "Animation 3D - exemple.pdf",
+          "Production Audio - exemple.pdf"
+        ];
+        progress = [
+          ["Montage Vidéo", "50%"],
+          ["Design Graphique", "40%"],
+          ["Animation 3D", "30%"],
+          ["Production Audio", "20%"]
+        ];
+        document.getElementById('dashboardTitle') && (document.getElementById('dashboardTitle').textContent = "Orion University - Plateforme de cours en ligne");
+      } else if (filiere.includes('Finance')) {
+        coursTitle.textContent = "I - Cours en Finance et Comptabilité :";
+        cours = [
+          "Comptabilité Générale - exemple.pdf",
+          "Analyse Financière - exemple.pdf",
+          "Gestion Budgétaire - exemple.pdf",
+          "Audit Financier - exemple.pdf"
+        ];
+        progress = [
+          ["Comptabilité Générale", "55%"],
+          ["Analyse Financière", "35%"],
+          ["Gestion Budgétaire", "25%"],
+          ["Audit Financier", "15%"]
+        ];
+        document.getElementById('dashboardTitle') && (document.getElementById('dashboardTitle').textContent = "Orion University - Plateforme de cours en ligne");
+      }
+
+      coursList.innerHTML = '';
+      cours.forEach(c => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = 'src/exemple.pdf';
+        a.textContent = c;
+        a.target = '_blank';
+        li.appendChild(a);
+        coursList.appendChild(li);
+      });
+
+      progressCards.innerHTML = '';
+      progress.forEach(([t,p]) => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `<h3>${t}</h3><p>Progression : ${p}</p>`;
+        progressCards.appendChild(div);
+      });
+
+      const messagesList = document.getElementById('messagesList');
+      let notifications = loadNotifications();
+
+      function displayNotifications() {
+        messagesList.innerHTML = '';
+        notifications.forEach((n,i) => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          const text = document.createElement('div');
+          text.innerHTML = `<div style="white-space:pre-wrap;">${n.text}</div><div class="small-muted">${formatDate(n.date)}</div>`;
+          div.appendChild(text);
+          if (role === 'admin' || role === 'prof') {
+            const actions = document.createElement('div');
+            actions.className = 'actions';
+            const editBtn = document.createElement('button');
+            editBtn.className = 'icon-btn';
+            editBtn.innerHTML = '✏️';
+            editBtn.title = 'Modifier';
+            editBtn.onclick = () => openEditModal(i);
+            const delBtn = document.createElement('button');
+            delBtn.className = 'icon-btn';
+            delBtn.innerHTML = '🗑️';
+            delBtn.title = 'Supprimer';
+            delBtn.onclick = () => openConfirmModal(i);
+            actions.appendChild(editBtn);
+            actions.appendChild(delBtn);
+            div.appendChild(actions);
+          }
+          messagesList.appendChild(div);
+        });
+      }
+
+      function openEditModal(index) {
+        const m = document.getElementById('editModal');
+        const ta = document.getElementById('editMessage');
+        const meta = document.getElementById('editMeta');
+        ta.value = notifications[index].text;
+        meta.textContent = formatDate(notifications[index].date);
+        m.classList.add('show');
+        m.setAttribute('aria-hidden','false');
+        document.getElementById('saveEdit').onclick = () => {
+          const newText = ta.value.trim();
+          if (newText === '') return;
+          notifications[index].text = newText;
+          notifications[index].date = new Date().toISOString();
+          saveNotifications(notifications);
+          displayNotifications();
+          closeEditModal();
+        };
+        document.getElementById('cancelEdit').onclick = closeEditModal;
+      }
+
+      function closeEditModal() {
+        const m = document.getElementById('editModal');
+        m.classList.remove('show');
+        m.setAttribute('aria-hidden','true');
+      }
+
+      let deleteIndex = null;
+      function openConfirmModal(index) {
+        deleteIndex = index;
+        const m = document.getElementById('confirmModal');
+        m.classList.add('show');
+        m.setAttribute('aria-hidden','false');
+        document.getElementById('confirmDelete').onclick = () => {
+          notifications.splice(deleteIndex,1);
+          saveNotifications(notifications);
+          displayNotifications();
+          closeConfirmModal();
+        };
+        document.getElementById('cancelDelete').onclick = closeConfirmModal;
+      }
+      function closeConfirmModal() {
+        const m = document.getElementById('confirmModal');
+        m.classList.remove('show');
+        m.setAttribute('aria-hidden','true');
+        deleteIndex = null;
+      }
+
+      document.getElementById('publishBtn') && document.getElementById('publishBtn').addEventListener('click', () => {
+        const txt = document.getElementById('messageInput').value.trim();
+        if (!txt) return;
+        notifications.unshift({ text: txt, date: new Date().toISOString() });
+        saveNotifications(notifications);
+        document.getElementById('messageInput').value = '';
+        displayNotifications();
+      });
+
+      displayNotifications();
+    })();
   </script>
+
+  <script src="script.js"></script>
 </body>
 </html>
