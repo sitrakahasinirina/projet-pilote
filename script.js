@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (loginForm) {
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value.trim().toLowerCase();
 
       let valid = false;
 
@@ -19,17 +19,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       for (let i = 1; i <= 10; i++) {
-        if (email === `prof${i}@orion.com` && password === "Professeur") {
+        if (email === `prof${i}@orion.com` && password === "professeur") {
           localStorage.setItem("user", email);
           localStorage.setItem("role", "prof");
           valid = true;
         }
       }
 
-      if (
-        (email === "aritendry@orion.com" && password === "utilisateur") ||
-        (email === "eliace@orion.com" && password === "utilisateur")
-      ) {
+      const utilisateursSpeciaux = ["aritendry@orion.com", "eliace@orion.com"];
+      if (utilisateursSpeciaux.includes(email) && password === "utilisateur") {
         localStorage.setItem("user", email);
         localStorage.setItem("role", "utilisateur");
         valid = true;
@@ -47,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
         checkFiliere();
       } else {
         alert(
-          "Veuillez vous renseigner auprès de l'administrateur pour obtenir une identifiant autorisé sur ce plateforme"
+          "Veuillez vous renseigner auprès de l'administrateur pour obtenir une identifiant autorisé sur ce plateforme."
         );
       }
     });
